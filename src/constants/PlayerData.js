@@ -14,7 +14,7 @@ const playerData = {
   bio: {
     born: "01 - 10 - 1997",
     age: "27 YEARS",
-    nationality: "Bangladesh",
+    nationality: "Sri Lanka",
     collage:"Rahula College",
     height: "178 cm",
     weight: "178 cm",

@@ -1,5 +1,3 @@
-import React from "react";
-import Tag from "./Tag";
 import StatBox from "./StatBox";
 import InfoBox from "./InfoBox";
 import PlayerInfoBox from "./PlayerInfoBox";
