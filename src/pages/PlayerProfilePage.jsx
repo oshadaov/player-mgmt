@@ -9,14 +9,6 @@ const PlayerProfilePage = () => {
       {/* Hero / Profile Section */}
       <PlayerCard />
 
-      {/* Divider */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <hr className="border-white/20 my-10" />
-        <h2 className="text-3xl font-bold mb-6 text-center">📊 Career Season Stats</h2>
-
-        {/* Stats Table Section */}
-        <PlayerStatsTable />
-      </div>
     </div>
   );
 };
