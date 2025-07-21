@@ -11,7 +11,7 @@ const StatBox = ({ stats }) => {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-purple-800 to-fuchsia-700/90 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-white shadow-2xl">
+    <div className="bg-gradient-to-br from-purple-800 to-fuchsia-700/90 backdrop-blur-md border border-white/20  p-6 text-white shadow-2xl">
       <h2 className="text-lg font-semibold mb-4 text-center">📊 Player Stats</h2>
       <div className="grid grid-cols-4 gap-4">
         {statItems.map((item, idx) => (
