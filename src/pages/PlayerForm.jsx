@@ -67,7 +67,7 @@ const PlayerForm = () => {
       });
 
       if (!res.ok) {
-        const errorText = await res.text().catch(() => "");
+        const errorText = await res.err;
         console.error("Backend error /players:", res.status, errorText);
         throw new Error(`Failed to submit player (${res.status})`);
       }
@@ -99,7 +99,7 @@ const PlayerForm = () => {
       console.error("❌ Error submitting player:", err);
       setSnackbar({
         open: true,
-        message: "❌ Failed to create player",
+        message: err.message,
         severity: "error",
       });
     } finally {

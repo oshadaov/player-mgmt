@@ -43,7 +43,7 @@ const HeroSection = ({ clubsCount = 0 }) => {
         {/* Left: text */}
         <div className="max-w-xl space-y-6 text-center md:text-left">
           <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
-            ⚽ Modern Football Management Platform
+            ⚽ Testing this 1234
             <span className="h-1 w-1 rounded-full bg-emerald-400" />
             <span className="text-[10px] text-emerald-200">
               Designed for clubs & players
