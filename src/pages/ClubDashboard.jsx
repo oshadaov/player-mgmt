@@ -5,7 +5,7 @@ import API from "../auth/api";
 import PitchBg from "../assets/hero.jpg";
 
 import ClubOverviewCard from "../components/ClubOverviewCard";
-import ClubPlayersSection from "../components/ClubPlayersSection";
+import ClubSquadManager from "../components/club/ClubSquadManager";
 
 const ClubDashboard = () => {
   const { id: routeId } = useParams();
@@ -162,6 +162,20 @@ const ClubDashboard = () => {
             </span>
             <button
               type="button"
+              onClick={() => navigate("/club/player-updates")}
+              className="rounded-full bg-amber-500/10 border border-amber-500/40 px-4 py-1 text-amber-400 font-bold hover:bg-amber-500/20 transition"
+            >
+              Review Player Updates
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/club/edit-profile")}
+              className="rounded-full bg-emerald-500 px-4 py-1 text-slate-950 font-bold hover:bg-emerald-400 transition"
+            >
+              Edit Profile
+            </button>
+            <button
+              type="button"
               onClick={() => navigate("/")}
               className="rounded-full bg-slate-900/80 px-3 py-1 text-slate-300 hover:text-emerald-300"
             >
@@ -196,13 +210,19 @@ const ClubDashboard = () => {
           </div>
         </section>
 
-        {/* Players management */}
-        <ClubPlayersSection
-          players={players}
-          onAddPlayer={handleAddPlayer}
-          onEditPlayer={handleEditPlayer}
-          onRemovePlayer={handleRemovePlayer}
-        />
+        {/* Specialized Squad Management */}
+        <section className="mt-8">
+           <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold">Squad Roster</h2>
+              <button 
+                onClick={handleAddPlayer}
+                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-4 py-2 rounded-xl font-bold text-xs transition"
+              >
+                + Register New Player
+              </button>
+           </div>
+           <ClubSquadManager clubId={club.id} />
+        </section>
       </main>
     </div>
   );

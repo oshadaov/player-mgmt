@@ -13,7 +13,7 @@ const PLACEHOLDER = PlaceHolder;
 
 // Optional: centralize base URL
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8022";
+  import.meta.env.VITE_API_BASE || "http://localhost:8088";
 
 const EditPlayerPage = () => {
   const { id } = useParams();
@@ -62,7 +62,7 @@ const EditPlayerPage = () => {
 
     const fetchPlayer = async () => {
       try {
-        const res = await api.get(`${API_BASE_URL}/players/${id}`, {
+        const res = await api.get(`${API_BASE_URL}/api/players/${id}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
@@ -151,34 +151,42 @@ const EditPlayerPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = new FormData();
-
-    // 🔹 These keys must match your CreatePlayerRequestDTO field names
-    Object.entries(formData).forEach(([k, v]) => data.append(k, v ?? ""));
-
-    if (images.playerImage) data.append("playerImage", images.playerImage);
-    if (images.visaImage) data.append("visaImage", images.visaImage);
-    if (images.passportImage) data.append("passportImage", images.passportImage);
+    const role = localStorage.getItem("role");
 
     try {
-      await api.put(`${API_BASE_URL}/players/${id}`, data, {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setSnackbar({
-        open: true,
-        message: "✅ Player updated successfully!",
-        severity: "success",
-      });
-      navigate("/players");
+      if (role === "CLUB") {
+        await api.put(`${API_BASE_URL}/api/players/${id}/propose-update`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSnackbar({
+          open: true,
+          message: "✅ Update proposal submitted for Admin approval!",
+          severity: "success",
+        });
+      } else {
+        const data = new FormData();
+        Object.entries(formData).forEach(([k, v]) => data.append(k, v ?? ""));
+        if (images.playerImage) data.append("playerImage", images.playerImage);
+        
+        await api.put(`${API_BASE_URL}/api/players/${id}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setSnackbar({
+          open: true,
+          message: "✅ Player updated successfully!",
+          severity: "success",
+        });
+      }
+      setTimeout(() => navigate(-1), 2000);
     } catch (err) {
       console.error("Error updating player:", err);
-      alert("Failed to update player");setSnackbar({
+      setSnackbar({
         open: true,
-        message: "Failed to update player",
-        severity: "success",
+        message: err.response?.data?.message || "Failed to update player",
+        severity: "error",
       });
     }
   };

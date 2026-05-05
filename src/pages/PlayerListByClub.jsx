@@ -8,11 +8,8 @@ const PlayerListByClub = () => {
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    API.get("/users/all").then((res) => {
-      const clubPlayers = res.data.filter(
-        (u) => u.role === "PLAYER" && u.club?.id === parseInt(clubId)
-      );
-      setPlayers(clubPlayers);
+    API.get(`/api/players/club/${clubId}`).then((res) => {
+      setPlayers(res.data);
     });
   }, [clubId]);
 
@@ -24,7 +21,7 @@ const PlayerListByClub = () => {
       <List>
         {players.map((player) => (
           <ListItem key={player.id}>
-            <ListItemText primary={player.name} secondary={`Username: ${player.username}`} />
+            <ListItemText primary={player.fullName} secondary={`Email: ${player.email}`} />
           </ListItem>
         ))}
       </List>

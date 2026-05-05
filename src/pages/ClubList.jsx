@@ -5,7 +5,7 @@ import API from "../auth/api";
 import PitchBg from "../assets/hero.jpg";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL 
+  import.meta.env.VITE_API_BASE || "http://localhost:8088";
 
 const ClubList = () => {
   const [clubs, setClubs] = useState([]);
@@ -21,7 +21,7 @@ const ClubList = () => {
 
         const token = localStorage.getItem("token");
 
-        const res = await API.get("/api/clubs/all", {
+        const res = await API.get("/api/clubs", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
@@ -43,6 +43,65 @@ const ClubList = () => {
 
     fetchClubs();
   }, []);
+
+  const handleApprove = async (id) => {
+    if (!window.confirm("Are you sure you want to approve this club?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      await API.put(`/api/clubs/${id}/approve`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Club approved successfully!");
+      // Refresh list
+      setClubs(prev => prev.map(c => c.id === id ? { ...c, status: "APPROVED" } : c));
+    } catch (err) {
+      console.error("❌ Approval error:", err);
+      alert("Failed to approve club.");
+    }
+  };
+
+  const handleReject = async (id) => {
+    const reason = window.prompt("Enter rejection reason:");
+    if (reason === null) return;
+    try {
+      const token = localStorage.getItem("token");
+      await API.put(`/api/clubs/${id}/reject`, { reason }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Club rejected.");
+      setClubs(prev => prev.map(c => c.id === id ? { ...c, status: "REJECTED", rejectionReason: reason } : c));
+    } catch (err) {
+      console.error("❌ Rejection error:", err);
+      alert("Failed to reject club.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to permanently delete this club? This will also remove their login access.")) return;
+    try {
+      const token = localStorage.getItem("token");
+      await API.delete(`/api/clubs/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Club deleted successfully.");
+      setClubs(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+      console.error("❌ Deletion error:", err);
+      alert("Failed to delete club.");
+    }
+  };
+
+  const handleResendActivation = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await API.post(`/api/clubs/${id}/resend-activation`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Activation email resent!");
+    } catch (err) {
+      alert("Failed to resend activation.");
+    }
+  };
 
   // ✅ Always work with a guaranteed array
   const clubArray = Array.isArray(clubs) ? clubs : [];
@@ -219,22 +278,70 @@ const ClubList = () => {
                     </div>
 
                     {/* Info */}
-                    <h2 className="text-lg font-semibold text-center text-slate-50">
-                      {club.clubName}
-                    </h2>
-                    <p className="mt-1 text-center text-xs text-slate-300">
-                      Manager:{" "}
-                      <span className="text-slate-100">{manager}</span>
-                    </p>
-                    <p className="mt-1 break-all text-center text-[11px] text-slate-400">
-                      {email}
-                    </p>
+                    <div className="flex-1">
+                      <h2 className="text-lg font-semibold text-center text-slate-50">
+                        {club.clubName}
+                      </h2>
+                      <div className="mt-2 flex justify-center">
+                        <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                          club.status === "APPROVED" ? "bg-emerald-500/20 text-emerald-400" :
+                          club.status === "REJECTED" ? "bg-red-500/20 text-red-400" :
+                          "bg-amber-500/20 text-amber-400"
+                        }`}>
+                          {club.status}
+                        </span>
+                        {club.status === "APPROVED" && (
+                          <button
+                            onClick={() => handleResendActivation(club.id)}
+                            className="ml-2 text-[10px] text-emerald-400 hover:underline"
+                          >
+                            Resend Mail
+                          </button>
+                        )}
+                      </div>
+                      <p className="mt-2 text-center text-xs text-slate-300">
+                        Manager:{" "}
+                        <span className="text-slate-100">{manager}</span>
+                      </p>
+                      <p className="mt-1 break-all text-center text-[11px] text-slate-400">
+                        {email}
+                      </p>
+                    </div>
+
+                    {/* Admin Actions */}
+                    {club.status === "PENDING" && (
+                      <div className="mt-4 flex gap-2">
+                        <button
+                          onClick={() => handleApprove(club.id)}
+                          className="flex-1 rounded-xl bg-emerald-500 py-2 text-xs font-bold text-slate-950 transition hover:bg-emerald-400"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(club.id)}
+                          className="flex-1 rounded-xl border border-red-500/50 bg-red-500/10 py-2 text-xs font-bold text-red-400 transition hover:bg-red-500/20"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
 
                     {/* Footer */}
                     <div className="mt-4 flex items-center justify-between text-[11px] text-slate-300">
-                      <span className="rounded-full bg-slate-800/90 px-3 py-1">
-                        Category: Football
-                      </span>
+                      <div className="flex gap-2">
+                        <Link
+                          to={`/clubs/edit/${club.id}`}
+                          className="rounded-lg bg-slate-800 px-2 py-1 hover:text-emerald-300"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(club.id)}
+                          className="rounded-lg bg-slate-800 px-2 py-1 text-red-400 hover:bg-red-500/20"
+                        >
+                          Delete
+                        </button>
+                      </div>
                       <Link
                         to={`/clubs/${club.id}`}
                         className="text-emerald-300 hover:text-emerald-200"

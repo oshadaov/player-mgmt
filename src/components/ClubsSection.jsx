@@ -19,7 +19,7 @@ const ClubsSection = () => {
         setError("");
 
         // If /api/clubs/all is public (permitAll), no token required
-        const res = await API.get("/api/clubs/all");
+        const res = await API.get("/api/clubs");
 
         // Some backends return an array, some wrap in {content: [...]}
         const raw = res.data;

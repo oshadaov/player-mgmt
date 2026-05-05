@@ -1,10 +1,11 @@
 // src/pages/PlayerList.jsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PitchBg from "../assets/hero.jpg";
-import PlaceHolder from "../assets/placeholder.jpg"
+import PlaceHolder from "../assets/placeholder.jpg";
+import API from "../auth/api";
 
-const PLACEHOLDER = {PlaceHolder};
+const PLACEHOLDER = PlaceHolder;
 
 const PlayerList = () => {
   const [players, setPlayers] = useState([]);
@@ -19,16 +20,13 @@ const PlayerList = () => {
         setError("");
 
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8022/players", {
+        const res = await API.get("/api/players", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch players");
-
-        const data = await res.json();
-        setPlayers(data || []);
+        setPlayers(res.data || []);
       } catch (err) {
         console.error("❌ Error fetching players:", err);
         setError("Failed to load players");
@@ -39,6 +37,18 @@ const PlayerList = () => {
 
     fetchPlayers();
   }, []);
+
+  const handleResendActivation = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await API.post(`/api/players/${id}/resend-activation`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Activation email resent!");
+    } catch (err) {
+      alert("Failed to resend activation.");
+    }
+  };
 
   // Stats
   const totalPlayers = players.length;
@@ -170,7 +180,7 @@ const PlayerList = () => {
                   {/* Player Image */}
                   <div className="flex justify-center mb-4">
                     <img
-                      src={`http://localhost:8022/players/${player.id}/playerImage`}
+                      src={`http://localhost:8088/api/players/${player.id}/playerImage`}
                       alt={player.name}
                       className="w-24 h-24 object-cover rounded-full border-2 border-emerald-400/50 shadow-md"
                       onError={(e) => {
@@ -186,6 +196,14 @@ const PlayerList = () => {
                   </h2>
                   <p className="text-center text-xs text-emerald-300">
                     {player.role || "Player"}
+                    {player.status === "APPROVED" && (
+                      <button 
+                        onClick={() => handleResendActivation(player.id)}
+                        className="ml-2 text-[10px] text-emerald-400 hover:underline"
+                      >
+                        (Resend Mail)
+                      </button>
+                    )}
                   </p>
                   <p className="text-center text-[11px] text-slate-400 mt-1 break-all">
                     {player.email}

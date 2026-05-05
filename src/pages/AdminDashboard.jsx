@@ -3,7 +3,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../auth/api";
 import PitchBg from "../assets/hero.jpg";
-import fallbackLogo from "../assets/placeholder.jpg"; // 👈 add a placeholder
+import fallbackLogo from "../assets/placeholder.jpg"; 
+import AdminClubRegistry from "../components/admin/AdminClubRegistry";
+import AdminClubApprovalList from "../components/admin/AdminClubApprovalList";
 
 const AdminDashboard = () => {
   const [clubs, setClubs] = useState([]);
@@ -25,7 +27,7 @@ const AdminDashboard = () => {
     const fetchClubs = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await API.get("/api/clubs/all", {
+        const res = await API.get("/api/clubs", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
@@ -87,6 +89,14 @@ const AdminDashboard = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-[11px]">
+            {localStorage.getItem("role") === "SUPER_ADMIN" && (
+              <Link
+                to="/superadmindashboard"
+                className="rounded-full bg-emerald-500 px-3 py-1 text-slate-950 font-bold hover:bg-emerald-400 transition"
+              >
+                Super Admin Console
+              </Link>
+            )}
             <Link
               to="/"
               className="rounded-full bg-slate-900/80 px-3 py-1 text-slate-300 hover:text-emerald-300"
@@ -100,8 +110,9 @@ const AdminDashboard = () => {
         </header>
 
         {/* Top row: stats */}
-        <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-4">
           <StatCard label="Total Clubs" value={totalClubs} />
+          <StatCard label="Pending Approval" value={clubs.filter(c => c.status === "PENDING").length} />
           <StatCard label="With Logos" value={clubsWithLogo} />
           <StatCard label="Without Logo" value={clubsWithoutLogo} />
         </section>
@@ -115,7 +126,8 @@ const AdminDashboard = () => {
             Common admin tasks you’ll use frequently.
           </p>
 
-          <div className="grid gap-3 sm:grid-cols-3 text-sm">
+          <div className="grid gap-6 lg:grid-cols-[1fr,250px]">
+            <div className="grid gap-3 sm:grid-cols-2 text-sm">
             <Link
               to="/create-club"
               className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 hover:border-emerald-300 hover:bg-emerald-500/20 transition"
@@ -147,6 +159,21 @@ const AdminDashboard = () => {
             </Link>
 
             <Link
+              to="/admin/player-updates"
+              className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
+            >
+              <div>
+                <p className="font-semibold text-slate-100">
+                  Player Updates
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Review and approve player detail changes from clubs.
+                </p>
+              </div>
+              <span className="text-xl text-emerald-300">📝</span>
+            </Link>
+
+            <Link
               to="/clubs"
               className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
             >
@@ -160,93 +187,42 @@ const AdminDashboard = () => {
               </div>
               <span className="text-xl text-emerald-300">📊</span>
             </Link>
-          </div>
-        </section>
-
-        {/* Recent clubs */}
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
-          <div className="mb-3 flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-semibold text-slate-50">
-                Recent Clubs
-              </h2>
-              <p className="text-[11px] text-slate-400">
-                Latest registered clubs in the system.
-              </p>
-            </div>
 
             <Link
-              to="/clubs"
-              className="text-[11px] text-emerald-300 hover:text-emerald-200"
+              to="/admin/club-updates"
+              className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
             >
-              View all &rsaquo;
+              <div>
+                <p className="font-semibold text-slate-100">
+                  Club Profile Updates
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Review and approve club data changes.
+                </p>
+              </div>
+              <span className="text-xl text-emerald-300">🏛️</span>
             </Link>
           </div>
 
-          {loading ? (
-            <p className="text-xs text-slate-400">Loading clubs...</p>
-          ) : error ? (
-            <p className="text-xs text-red-300">{error}</p>
-          ) : recentClubs.length === 0 ? (
-            <p className="text-xs text-slate-400">
-              No clubs registered yet. Use{" "}
-              <span className="text-emerald-300">Create Club</span> to add one.
+          {/* Pending Approvals Sidebar */}
+          <div className="bg-slate-950/40 p-4 rounded-2xl border border-slate-800">
+            <h3 className="text-xs font-bold uppercase text-slate-500 mb-4 tracking-widest">Pending Clubs</h3>
+            <AdminClubApprovalList />
+          </div>
+        </div>
+      </section>
+
+        {/* Comprehensive Club Registry */}
+        <section className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
+          <div className="mb-6">
+            <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
+              Global Club Registry
+            </h2>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Authorized view of all federated football clubs.
             </p>
-          ) : (
-            <div className="space-y-2 text-sm">
-              {recentClubs.map((club) => {
-                const manager =
-                  club.licenseManagerName || club.managerName || "Not set";
-                const email = club.username || club.email || "Not provided";
-
-                // ✅ Cloudinary URL (clubLogo or logoUrl)
-                const logoUrl = club.clubLogo || club.logoUrl || null;
-
-                return (
-                  <div
-                    key={club.id}
-                    className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2.5"
-                  >
-                    <div className="flex items-center gap-3">
-                      {/* mini logo */}
-                      {logoUrl ? (
-                        <div className="h-8 w-8 overflow-hidden rounded-xl border border-emerald-400/40 bg-slate-950">
-                          <img
-                            src={logoUrl}
-                            alt={`${club.clubName} Logo`}
-                            className="h-full w-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = fallbackLogo;
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-700 bg-slate-950 text-xs font-semibold text-slate-100">
-                          {club.clubName?.charAt(0) || "C"}
-                        </div>
-                      )}
-
-                      <div>
-                        <p className="text-sm font-medium text-slate-50">
-                          {club.clubName}
-                        </p>
-                        <p className="text-[11px] text-slate-400">
-                          {manager} • {email}
-                        </p>
-                      </div>
-                    </div>
-
-                    <Link
-                      to={`/clubs/${club.id}`}
-                      className="text-[11px] text-emerald-300 hover:text-emerald-200"
-                    >
-                      Open
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          </div>
+          <AdminClubRegistry />
         </section>
       </main>
     </div>

@@ -23,14 +23,33 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const data = await loginRequest(form.username, form.password);
-      // backend should return { token: "..." }
       if (!data?.token) throw new Error("No token returned");
+      
+      // Save all session info
       login(data.token);
-      setSnack({ open: true, message: "Logged in", severity: "success" });
-      // optionally redirect depending on role
-      const payload = JSON.parse(atob(data.token.split(".")[1]));
-      if (payload.role === "ADMIN") navigate("/admin");
-      else navigate("/players");
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("entityId", data.entityId);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("user", JSON.stringify({
+        username: data.username,
+        role: data.role
+      }));
+
+      setSnack({ open: true, message: "Login successful!", severity: "success" });
+
+      // Role-based redirection
+      if (data.role === "SUPER_ADMIN") {
+        navigate("/superadmindashboard");
+      } else if (data.role === "ADMIN") {
+        navigate("/admindashboard");
+      } else if (data.role === "CLUB") {
+        navigate(`/clubs/${data.entityId}`);
+      } else if (data.role === "PLAYER") {
+        navigate("/players/profile");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       console.error(err);
       setSnack({ open: true, message: err?.response?.data?.message || err.message || "Login failed", severity: "error" });

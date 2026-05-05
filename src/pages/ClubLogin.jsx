@@ -24,16 +24,16 @@ const ClubLogin = () => {
 
     try {
       const res = await api.post(
-        "/api/users/login",
+        "/auth/login",
         credentials
       );
 
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userId", res.data.id);
+      localStorage.setItem("userId", res.data.userId);
       localStorage.setItem("role", res.data.role);
 
       if (res.data.role === "CLUB") {
-        navigate(`/clubs/${res.data.id}`);
+        navigate(`/clubs/${res.data.entityId}`);
       } else if (res.data.role === "ADMIN") {
         navigate("/admindashboard");
       } else {
