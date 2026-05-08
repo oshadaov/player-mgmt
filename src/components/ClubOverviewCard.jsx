@@ -58,7 +58,20 @@ const ClubOverviewCard = ({ club, playerCount }) => {
       <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
         <MiniStat label="Players" value={playerCount} />
         <MiniStat label="Category" value="Football" />
-        <MiniStat label="Status" value="Active" />
+        <MiniStat label="Status" value={club.status || "Active"} />
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-slate-800/50 flex justify-between items-center text-[9px] text-slate-500 uppercase tracking-widest">
+        <div>
+          <span className="block text-[8px]">Registered on</span>
+          <span className="text-slate-400">{club.createdAt ? new Date(club.createdAt).toLocaleDateString() : "N/A"}</span>
+          <span className="ml-2 lowercase italic text-slate-600">by {club.createdBy || "system"}</span>
+        </div>
+        <div className="text-right">
+          <span className="block text-[8px]">Last updated</span>
+          <span className="text-slate-400">{club.updatedAt ? new Date(club.updatedAt).toLocaleDateString() : "N/A"}</span>
+          <span className="ml-2 lowercase italic text-slate-600">by {club.updatedBy || "system"}</span>
+        </div>
       </div>
     </article>
   );

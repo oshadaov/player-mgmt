@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from "react";
 import API from "../auth/api";
 import PitchBg from "../assets/hero.jpg";
+import { useAuth } from "../auth/AuthContext";
 
 const ClubProfileEdit = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     clubName: "",
     district: "",
@@ -19,9 +21,9 @@ const ClubProfileEdit = () => {
 
   useEffect(() => {
     const fetchClub = async () => {
+      if (!user?.entityId || user.entityId === "null") return;
       try {
-        const clubId = localStorage.getItem("entityId");
-        const res = await API.get(`/api/clubs/${clubId}`);
+        const res = await API.get(`/api/clubs/${user.entityId}`);
         setFormData(res.data);
       } catch (err) {
         console.error("Error fetching club:", err);
@@ -30,7 +32,7 @@ const ClubProfileEdit = () => {
       }
     };
     fetchClub();
-  }, []);
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,10 +40,13 @@ const ClubProfileEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user?.entityId || user.entityId === "null") {
+      alert("Invalid session. Please log in again.");
+      return;
+    }
     setSubmitting(true);
     try {
-      const clubId = localStorage.getItem("entityId");
-      await API.put(`/api/clubs/${clubId}/propose-update`, formData);
+      await API.put(`/api/clubs/${user.entityId}/propose-update`, formData);
       alert("Update request submitted! An administrator will review your changes.");
     } catch (err) {
       alert("Failed to submit update request.");

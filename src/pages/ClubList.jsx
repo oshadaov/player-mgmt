@@ -77,17 +77,32 @@ const ClubList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to permanently delete this club? This will also remove their login access.")) return;
+    if (!window.confirm("Are you sure you want to request deletion for this club? It will need Super Admin approval.")) return;
     try {
       const token = localStorage.getItem("token");
       await API.delete(`/api/clubs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert("Club deleted successfully.");
-      setClubs(prev => prev.filter(c => c.id !== id));
+      alert("Deletion request submitted to Super Admin.");
+      setClubs(prev => prev.map(c => c.id === id ? { ...c, status: "PENDING_DELETION" } : c));
     } catch (err) {
       console.error("❌ Deletion error:", err);
-      alert("Failed to delete club.");
+      alert("Failed to request deletion.");
+    }
+  };
+
+  const handleConfirmDelete = async (id) => {
+    if (!window.confirm("PERMANENTLY DELETE this club? This action cannot be undone.")) return;
+    try {
+      const token = localStorage.getItem("token");
+      await API.delete(`/api/clubs/${id}/confirm`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Club permanently removed.");
+      setClubs(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+      console.error("❌ Permanent deletion error:", err);
+      alert("Failed to confirm deletion.");
     }
   };
 
@@ -286,6 +301,7 @@ const ClubList = () => {
                         <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
                           club.status === "APPROVED" ? "bg-emerald-500/20 text-emerald-400" :
                           club.status === "REJECTED" ? "bg-red-500/20 text-red-400" :
+                          club.status === "PENDING_DELETION" ? "bg-rose-500/20 text-rose-400" :
                           "bg-amber-500/20 text-amber-400"
                         }`}>
                           {club.status}
@@ -327,27 +343,40 @@ const ClubList = () => {
                     )}
 
                     {/* Footer */}
-                    <div className="mt-4 flex items-center justify-between text-[11px] text-slate-300">
-                      <div className="flex gap-2">
+                    <div className="mt-4 flex flex-col gap-3">
+                      <div className="flex items-center justify-between text-[11px] text-slate-300">
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/clubs/edit/${club.id}`}
+                            className="rounded-lg bg-slate-800 px-2 py-1 hover:text-emerald-300 transition"
+                          >
+                            Edit
+                          </Link>
+                          {club.status !== "PENDING_DELETION" && (
+                            <button
+                              onClick={() => handleDelete(club.id)}
+                              className="rounded-lg bg-slate-800 px-2 py-1 text-red-400 hover:bg-red-500/20 transition"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
                         <Link
-                          to={`/clubs/edit/${club.id}`}
-                          className="rounded-lg bg-slate-800 px-2 py-1 hover:text-emerald-300"
+                          to={`/clubs/${club.id}`}
+                          className="text-emerald-300 hover:text-emerald-200"
                         >
-                          Edit
+                          View &rsaquo;
                         </Link>
-                        <button
-                          onClick={() => handleDelete(club.id)}
-                          className="rounded-lg bg-slate-800 px-2 py-1 text-red-400 hover:bg-red-500/20"
-                        >
-                          Delete
-                        </button>
                       </div>
-                      <Link
-                        to={`/clubs/${club.id}`}
-                        className="text-emerald-300 hover:text-emerald-200"
-                      >
-                        View &rsaquo;
-                      </Link>
+
+                      {club.status === "PENDING_DELETION" && localStorage.getItem("role") === "SUPER_ADMIN" && (
+                        <button
+                          onClick={() => handleConfirmDelete(club.id)}
+                          className="w-full bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold py-2 rounded-xl transition shadow-lg shadow-rose-500/20"
+                        >
+                          CONFIRM PERMANENT DELETION
+                        </button>
+                      )}
                     </div>
                   </article>
                 );

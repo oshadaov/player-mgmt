@@ -9,9 +9,33 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) {
+  const user = localStorage.getItem("user");
+  const role = localStorage.getItem("role");
+
+  if (token && token !== "null" && token !== "undefined") {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  if (user && user !== "null" && user !== "undefined") {
+    try {
+      const parsedUser = JSON.parse(user);
+      if (parsedUser) {
+        config.headers["X-Username"] = parsedUser.username || parsedUser.email;
+      }
+    } catch (e) {
+      config.headers["X-Username"] = user;
+    }
+  }
+
+  if (role && role !== "null" && role !== "undefined") {
+    config.headers["X-User-Role"] = role;
+  }
+
+  const entityId = localStorage.getItem("entityId");
+  if (entityId && entityId !== "null" && entityId !== "undefined") {
+    config.headers["X-Entity-Id"] = entityId;
+  }
+
   return config;
 });
 

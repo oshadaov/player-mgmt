@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import PitchBg from "../assets/hero.jpg"; 
-import api from "../auth/api.js" 
+import { useAuth } from "../auth/AuthContext";
+import api from "../auth/api";
 
 const PlayerForm = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     fullName: "",
     nic: "",
@@ -17,7 +19,7 @@ const PlayerForm = () => {
     dominantFoot: "",
     jerseyNumber: "",
     previousClubs: "",
-    clubId: localStorage.getItem("entityId") || "" 
+    clubId: user?.entityId || "" 
   });
 
   const [photoFile, setPhotoFile] = useState(null);
@@ -69,7 +71,7 @@ const PlayerForm = () => {
         dominantFoot: "",
         jerseyNumber: "",
         previousClubs: "",
-        clubId: localStorage.getItem("entityId") || ""
+        clubId: user?.entityId || ""
       });
       setPhotoFile(null);
       setNicFile(null);

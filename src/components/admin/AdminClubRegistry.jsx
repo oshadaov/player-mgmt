@@ -1,5 +1,6 @@
 // src/components/admin/AdminClubRegistry.jsx
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import API from "../../auth/api";
 
 const AdminClubRegistry = () => {
@@ -46,7 +47,7 @@ const AdminClubRegistry = () => {
                 </span>
               </td>
               <td className="px-6 py-4">
-                <button className="text-sky-400 hover:underline">View Profile</button>
+                <Link to={`/clubs/${club.id}/view`} className="text-emerald-400 hover:underline">View Profile</Link>
               </td>
             </tr>
           ))}

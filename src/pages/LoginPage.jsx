@@ -27,25 +27,44 @@ const LoginPage = () => {
       
       // Save all session info
       login(data.token);
-      localStorage.setItem("role", data.role);
+      
+      const role = data.role;
+      const entityId = data.entityId;
+      const username = data.username;
+
+      console.log("Login Success Data:", { role, entityId, username });
+
+      localStorage.setItem("role", role);
       localStorage.setItem("userId", data.userId);
-      localStorage.setItem("entityId", data.entityId);
-      localStorage.setItem("username", data.username);
+      localStorage.setItem("username", username);
+      
+      if (entityId) {
+        localStorage.setItem("entityId", entityId);
+      } else {
+        localStorage.removeItem("entityId");
+      }
+
       localStorage.setItem("user", JSON.stringify({
-        username: data.username,
-        role: data.role
+        username: username,
+        role: role,
+        entityId: entityId
       }));
 
       setSnack({ open: true, message: "Login successful!", severity: "success" });
 
       // Role-based redirection
-      if (data.role === "SUPER_ADMIN") {
+      if (role === "SUPER_ADMIN") {
         navigate("/superadmindashboard");
-      } else if (data.role === "ADMIN") {
+      } else if (role === "ADMIN") {
         navigate("/admindashboard");
-      } else if (data.role === "CLUB") {
-        navigate(`/clubs/${data.entityId}`);
-      } else if (data.role === "PLAYER") {
+      } else if (role === "CLUB") {
+        if (!entityId || entityId === "null") {
+          console.error("Missing entityId for CLUB user");
+          setSnack({ open: true, message: "Incomplete club profile. Contact support.", severity: "error" });
+        } else {
+          navigate(`/clubs/${entityId}`);
+        }
+      } else if (role === "PLAYER") {
         navigate("/players/profile");
       } else {
         navigate("/");

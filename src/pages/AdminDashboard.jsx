@@ -6,6 +6,7 @@ import PitchBg from "../assets/hero.jpg";
 import fallbackLogo from "../assets/placeholder.jpg"; 
 import AdminClubRegistry from "../components/admin/AdminClubRegistry";
 import AdminClubApprovalList from "../components/admin/AdminClubApprovalList";
+import AdminPlayerRegistry from "../components/admin/AdminPlayerRegistry";
 
 const AdminDashboard = () => {
   const [clubs, setClubs] = useState([]);
@@ -212,17 +213,35 @@ const AdminDashboard = () => {
         </div>
       </section>
 
-        {/* Comprehensive Club Registry */}
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
-          <div className="mb-6">
-            <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
-              Global Club Registry
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-1">
-              Authorized view of all federated football clubs.
-            </p>
+        {/* Registries Section */}
+        <section className="space-y-6">
+          {/* Club Registry */}
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
+                  Global Club Registry
+                </h2>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Authorized view of all federated football clubs.
+                </p>
+              </div>
+            </div>
+            <AdminClubRegistry />
           </div>
-          <AdminClubRegistry />
+
+          {/* Player Registry */}
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
+            <div className="mb-6">
+              <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
+                Global Player Registry
+              </h2>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Authorized view of all registered players across all clubs.
+              </p>
+            </div>
+            <AdminPlayerRegistry />
+          </div>
         </section>
       </main>
     </div>

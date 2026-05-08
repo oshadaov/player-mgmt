@@ -15,7 +15,7 @@ const ClubDetails = () => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const res = await API.get(`/api/public/clubs/${id}`);
+        const res = await API.get(`/api/clubs/${id}`);
         setClub(res.data);
       } catch (err) {
         console.error("Error fetching club details:", err);

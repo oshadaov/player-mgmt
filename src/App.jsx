@@ -26,16 +26,34 @@ import ClubDetails from "./pages/ClubDetails";
 import PlayerDetails from "./pages/PlayerDetails";
 import LoginPage from "./pages/LoginPage";
 
+import { useAuth } from "./auth/AuthContext";
+
 function App() {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const { token, user } = useAuth();
 
   // Helper to protect routes by role
   const ProtectedRoute = ({ children, allowedRoles }) => {
     if (!token) return <Navigate to="/login" />;
-    if (allowedRoles && !allowedRoles.includes(role)) {
-      return <Navigate to={role === "CLUB" ? `/clubs/${localStorage.getItem("entityId")}` : "/"} />;
+    
+    const currentRole = user?.role || localStorage.getItem("role");
+    const currentEntityId = user?.entityId || localStorage.getItem("entityId");
+
+    // Only CLUB and PLAYER roles REQUIRE an entityId to access their specific dashboard
+    const isRestrictedRole = currentRole === "CLUB" || currentRole === "PLAYER";
+    const hasInvalidId = !currentEntityId || currentEntityId === "null" || currentEntityId === "undefined";
+
+    // 1. Check Role Permission
+    if (allowedRoles && !allowedRoles.includes(currentRole)) {
+      return <Navigate to="/" />;
     }
+
+    // 2. Check Entity Identity (only for restricted roles)
+    // We only block if the current route is one that REQUIRES the role's dashboard (which is why we check allowedRoles)
+    if (isRestrictedRole && hasInvalidId && allowedRoles?.includes(currentRole)) {
+      console.warn(`Blocking access to ${currentRole} dashboard due to missing entityId`);
+      return <Navigate to="/" />;
+    }
+
     return children;
   };
 
@@ -64,9 +82,9 @@ function App() {
       <Route path="/club/player-updates" element={<ProtectedRoute allowedRoles={["CLUB"]}><ClubPlayerUpdates /></ProtectedRoute>} />
       <Route path="/player/edit-profile" element={<ProtectedRoute allowedRoles={["PLAYER"]}><PlayerProfileEdit /></ProtectedRoute>} />
       
-      {/* General Detail Views (Authenticated Only) */}
-      <Route path="/clubs/:id/view" element={<ProtectedRoute><ClubDetails /></ProtectedRoute>} />
-      <Route path="/players/:id/view" element={<ProtectedRoute><PlayerDetails /></ProtectedRoute>} />
+      {/* General Detail Views (Public) */}
+      <Route path="/clubs/:id/view" element={<ClubDetails />} />
+      <Route path="/players/:id/view" element={<PlayerDetails />} />
 
       {token ? (
         <>

@@ -1,21 +1,22 @@
-// src/pages/ClubPlayerUpdates.jsx
 import React, { useEffect, useState } from "react";
 import API from "../auth/api";
 import PitchBg from "../assets/hero.jpg";
+import { useAuth } from "../auth/AuthContext";
 
 const ClubPlayerUpdates = () => {
+  const { user } = useAuth();
   const [updates, setUpdates] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const clubId = localStorage.getItem("entityId");
-
   useEffect(() => {
-    fetchUpdates();
-  }, [clubId]);
+    if (user?.entityId && user.entityId !== "null") {
+      fetchUpdates();
+    }
+  }, [user]);
 
   const fetchUpdates = async () => {
     try {
-      const res = await API.get(`/api/players/updates/club/${clubId}`);
+      const res = await API.get(`/api/players/updates/club/${user.entityId}`);
       setUpdates(res.data || []);
     } catch (err) {
       console.error("Error fetching player updates:", err);

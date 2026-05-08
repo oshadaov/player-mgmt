@@ -2,23 +2,7 @@
 import React, { useEffect, useState } from "react";
 import API from "../../auth/api";
 
-const SuperAdminUserManagement = () => {
-  const [admins, setAdmins] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAdmins = async () => {
-      try {
-        const res = await API.get("/auth/admins");
-        setAdmins(res.data || []);
-      } catch (err) {
-        console.error("Super Admin retrieval failed:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAdmins();
-  }, []);
+const SuperAdminUserManagement = ({ admins, loading, onRemoveAdmin }) => {
 
   if (loading) return <div className="text-emerald-400 animate-pulse">Retrieving Admin Ledger...</div>;
 
@@ -36,9 +20,20 @@ const SuperAdminUserManagement = () => {
               <p className="text-[10px] text-slate-500 uppercase tracking-tighter">Access Level: Full Admin</p>
             </div>
           </div>
-          <div className="text-right">
-             <p className="text-[10px] text-slate-500">Registered</p>
-             <p className="text-xs text-slate-300">{new Date(admin.createdAt).toLocaleDateString()}</p>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+               <p className="text-[10px] text-slate-500">Registered</p>
+               <p className="text-xs text-slate-300">{new Date(admin.createdAt).toLocaleDateString()}</p>
+            </div>
+            <button 
+              onClick={() => onRemoveAdmin(admin.id)}
+              className="p-2 text-slate-500 hover:text-red-500 transition-colors"
+              title="Revoke Admin Access"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
           </div>
         </div>
       ))}

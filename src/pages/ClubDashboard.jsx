@@ -19,7 +19,7 @@ const ClubDashboard = () => {
   const role = localStorage.getItem("role");
 
   // 👇 Decide which club ID to use
-  const clubId = routeId || localStorage.getItem("userId");
+  const clubId = routeId || localStorage.getItem("entityId");
 
   useEffect(() => {
     const fetchClub = async () => {

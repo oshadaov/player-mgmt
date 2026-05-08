@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import LoginBg from "../assets/login.jpg"; // make sure this exists
 import api from "../auth/api.js"
+import { useAuth } from "../auth/AuthContext";
 
 const ClubLogin = () => {
+  const { login } = useAuth();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
@@ -28,9 +30,16 @@ const ClubLogin = () => {
         credentials
       );
 
-      localStorage.setItem("token", res.data.token);
+      login(res.data.token);
       localStorage.setItem("userId", res.data.userId);
       localStorage.setItem("role", res.data.role);
+      localStorage.setItem("entityId", res.data.entityId);
+      localStorage.setItem("username", res.data.username);
+      localStorage.setItem("user", JSON.stringify({
+        username: res.data.username,
+        role: res.data.role,
+        entityId: res.data.entityId
+      }));
 
       if (res.data.role === "CLUB") {
         navigate(`/clubs/${res.data.entityId}`);
