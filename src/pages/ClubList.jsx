@@ -326,19 +326,27 @@ const ClubList = () => {
 
                     {/* Admin Actions */}
                     {club.status === "PENDING" && (
-                      <div className="mt-4 flex gap-2">
-                        <button
-                          onClick={() => handleApprove(club.id)}
-                          className="flex-1 rounded-xl bg-emerald-500 py-2 text-xs font-bold text-slate-950 transition hover:bg-emerald-400"
+                      <div className="mt-4 flex flex-col gap-2">
+                        <Link
+                          to={`/admin/clubs/${club.id}/review`}
+                          className="w-full rounded-xl border border-amber-500/50 bg-amber-500/10 py-2 text-center text-xs font-bold text-amber-300 hover:bg-amber-500/20 transition"
                         >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleReject(club.id)}
-                          className="flex-1 rounded-xl border border-red-500/50 bg-red-500/10 py-2 text-xs font-bold text-red-400 transition hover:bg-red-500/20"
-                        >
-                          Reject
-                        </button>
+                          🔍 Full Review
+                        </Link>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleApprove(club.id)}
+                            className="flex-1 rounded-xl bg-emerald-500 py-2 text-xs font-bold text-slate-950 transition hover:bg-emerald-400"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(club.id)}
+                            className="flex-1 rounded-xl border border-red-500/50 bg-red-500/10 py-2 text-xs font-bold text-red-400 transition hover:bg-red-500/20"
+                          >
+                            Reject
+                          </button>
+                        </div>
                       </div>
                     )}
 

@@ -1,56 +1,42 @@
 // src/pages/LoginPage.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { loginRequest } from "../auth/authService";
 import { useAuth } from "../auth/AuthContext";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import PitchBg from "../assets/hero.jpg";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ username: "", password: "" });
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  const [snack, setSnack] = useState({ open: false, message: "", severity: "error" });
-
-  const handleClose = () => setSnack((s) => ({ ...s, open: false }));
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
     try {
       const data = await loginRequest(form.username, form.password);
       if (!data?.token) throw new Error("No token returned");
-      
-      // Save all session info
+
       login(data.token);
-      
+
       const role = data.role;
       const entityId = data.entityId;
       const username = data.username;
 
-      console.log("Login Success Data:", { role, entityId, username });
-
       localStorage.setItem("role", role);
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("username", username);
-      
+
       if (entityId) {
         localStorage.setItem("entityId", entityId);
       } else {
         localStorage.removeItem("entityId");
       }
 
-      localStorage.setItem("user", JSON.stringify({
-        username: username,
-        role: role,
-        entityId: entityId
-      }));
-
-      setSnack({ open: true, message: "Login successful!", severity: "success" });
+      localStorage.setItem("user", JSON.stringify({ username, role, entityId }));
 
       // Role-based redirection
       if (role === "SUPER_ADMIN") {
@@ -58,9 +44,9 @@ const LoginPage = () => {
       } else if (role === "ADMIN") {
         navigate("/admindashboard");
       } else if (role === "CLUB") {
-        if (!entityId || entityId === "null") {
-          console.error("Missing entityId for CLUB user");
-          setSnack({ open: true, message: "Incomplete club profile. Contact support.", severity: "error" });
+        if (!entityId || entityId === "null" || entityId === "0") {
+          // New representative — hasn't created a club yet → redirect to create club
+          navigate("/create-club");
         } else {
           navigate(`/clubs/${entityId}`);
         }
@@ -71,40 +57,74 @@ const LoginPage = () => {
       }
     } catch (err) {
       console.error(err);
-      setSnack({ open: true, message: err?.response?.data?.message || err.message || "Login failed", severity: "error" });
+      setError(err?.response?.data?.message || err.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-purple-900">
-      <form onSubmit={submit} className="bg-white/5 p-8 rounded-lg w-96">
-        <h2 className="text-2xl font-bold text-white mb-4">Sign in</h2>
+    <div
+      className="min-h-screen flex items-center justify-center bg-slate-950 text-white"
+      style={{
+        backgroundImage: `linear-gradient(rgba(5,10,25,0.85), rgba(5,10,25,0.96)), url(${PitchBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="w-full max-w-md bg-slate-900/90 p-10 rounded-3xl backdrop-blur-xl border border-slate-800 shadow-2xl">
+        <header className="mb-8 text-center">
+          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 text-2xl font-black text-slate-950 mb-4">⚽</div>
+          <h1 className="text-3xl font-black text-white uppercase tracking-tighter">SL Football</h1>
+          <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Management Portal</p>
+        </header>
 
-        <label className="text-sm text-white/80">Username</label>
-        <input
-          value={form.username}
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
-          className="w-full px-3 py-2 rounded-lg mb-3"
-        />
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/40 rounded-2xl text-red-400 text-xs text-center font-bold">
+            {error}
+          </div>
+        )}
 
-        <label className="text-sm text-white/80">Password</label>
-        <input
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          className="w-full px-3 py-2 rounded-lg mb-4"
-        />
+        <form onSubmit={submit} className="space-y-5">
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 ml-1">Email Address</label>
+            <input
+              type="email"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              required
+              className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl focus:border-emerald-500 outline-none transition text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 ml-1">Password</label>
+            <input
+              type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+              className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl focus:border-emerald-500 outline-none transition text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-emerald-500 text-slate-950 font-black py-4 rounded-2xl hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 uppercase tracking-widest mt-2 disabled:opacity-50"
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
+        </form>
 
-        <button type="submit" className="w-full bg-purple-600 py-2 rounded-lg text-white font-semibold">
-          Sign in
-        </button>
-      </form>
-
-      <Snackbar open={snack.open} autoHideDuration={4000} onClose={handleClose} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-        <Alert onClose={handleClose} severity={snack.severity}>
-          {snack.message}
-        </Alert>
-      </Snackbar>
+        <p className="mt-8 text-center text-xs text-slate-500">
+          New representative?{" "}
+          <Link to="/signup" className="text-emerald-400 font-bold hover:underline">
+            Create an Account
+          </Link>
+        </p>
+        <p className="mt-2 text-center text-xs text-slate-600">
+          <Link to="/" className="hover:text-slate-400">← Back to Home</Link>
+        </p>
+      </div>
     </div>
   );
 };

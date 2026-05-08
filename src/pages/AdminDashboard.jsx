@@ -130,15 +130,15 @@ const AdminDashboard = () => {
           <div className="grid gap-6 lg:grid-cols-[1fr,250px]">
             <div className="grid gap-3 sm:grid-cols-2 text-sm">
             <Link
-              to="/create-club"
+              to="/admin/invite-club"
               className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 hover:border-emerald-300 hover:bg-emerald-500/20 transition"
             >
               <div>
                 <p className="font-semibold text-emerald-200">
-                  Create Club
+                  Invite Club
                 </p>
                 <p className="text-[11px] text-emerald-100/80">
-                  Register a new club and generate login credentials.
+                  Issue an official registration invitation to a new club.
                 </p>
               </div>
               <span className="text-xl">+</span>
@@ -241,6 +241,28 @@ const AdminDashboard = () => {
               </p>
             </div>
             <AdminPlayerRegistry />
+          </div>
+
+          {/* Coaching Management */}
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl backdrop-blur">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
+                  Coaching Staff Registry
+                </h2>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Manage professional coaching staff and club assignments.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Link to="/admin/register-coach" className="bg-emerald-500 text-slate-950 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition">
+                  Register Coach
+                </Link>
+                <Link to="/coaches" className="bg-slate-950 border border-slate-800 text-slate-300 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-emerald-400 transition">
+                  View Full List
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
       </main>

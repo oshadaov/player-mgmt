@@ -1,5 +1,5 @@
 // src/pages/PlayerForm.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import PitchBg from "../assets/hero.jpg"; 
@@ -19,12 +19,21 @@ const PlayerForm = () => {
     dominantFoot: "",
     jerseyNumber: "",
     previousClubs: "",
-    clubId: user?.entityId || "" 
+    clubId: user?.entityId || localStorage.getItem("entityId") || "" 
   });
 
   const [photoFile, setPhotoFile] = useState(null);
   const [nicFile, setNicFile] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.entityId) {
+      setFormData(prev => ({ ...prev, clubId: user.entityId }));
+    } else {
+      const eid = localStorage.getItem("entityId");
+      if (eid) setFormData(prev => ({ ...prev, clubId: eid }));
+    }
+  }, [user]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",

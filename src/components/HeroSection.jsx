@@ -101,6 +101,11 @@ const HeroSection = ({ clubsCount = 0 }) => {
                 Club Login
               </button>
             </Link>
+            <Link to="/signup">
+              <button className="rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-xl shadow-sky-500/30 transition hover:bg-sky-400">
+                Join as Representative
+              </button>
+            </Link>
             <Link
               to="/registry"
               className="rounded-full border border-slate-500/70 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/80 hover:text-emerald-300"

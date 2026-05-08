@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PitchBg from "../assets/hero.jpg";
 import API from "../auth/api";
+import ClubCoachList from "../components/club/ClubCoachList";
 
 const EditClubForm = () => {
   const { id } = useParams();
@@ -116,6 +117,13 @@ const EditClubForm = () => {
               <input name="homeGroundLocation" value={formData.homeGroundLocation} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5" />
             </div>
           </div>
+          
+
+          <div className="pt-6 border-t border-slate-800">
+            <h3 className="text-sm font-bold text-sky-400 uppercase tracking-widest mb-4">Technical Staff</h3>
+            <ClubCoachList clubId={id} />
+          </div>
+
           <div className="pt-4 flex gap-4">
             <button type="submit" className="flex-1 bg-emerald-500 text-slate-950 font-bold py-3 rounded-xl hover:bg-emerald-400">Save Changes</button>
             <button type="button" onClick={() => navigate(-1)} className="flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-700">Cancel</button>

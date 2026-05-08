@@ -5,6 +5,7 @@ import API from "../auth/api";
 import PitchBg from "../assets/hero.jpg";
 import ClubOverviewCard from "../components/ClubOverviewCard";
 import ClubSquadManager from "../components/club/ClubSquadManager";
+import ClubCoachList from "../components/club/ClubCoachList";
 
 const ClubDetails = () => {
   const { id } = useParams();
@@ -39,6 +40,11 @@ const ClubDetails = () => {
         </header>
 
         <ClubOverviewCard club={club} playerCount={club.players?.length || 0} />
+
+        <div className="mt-12">
+          <h2 className="text-xl font-bold mb-6 border-b border-slate-800 pb-2 text-sky-400">Technical Staff</h2>
+          <ClubCoachList clubId={id} />
+        </div>
         
         <div className="mt-12">
           <h2 className="text-xl font-bold mb-6 border-b border-slate-800 pb-2">Registered Squad</h2>

@@ -1,11 +1,13 @@
 // src/components/club/ClubSquadManager.jsx
 import React, { useEffect, useState } from "react";
 import API from "../../auth/api";
+import { useNavigate } from "react-router-dom";
 
 const ClubSquadManager = ({ clubId }) => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchSquad = async () => {
       try {
@@ -30,7 +32,7 @@ const ClubSquadManager = ({ clubId }) => {
         </div>
       ) : (
         players.map(player => (
-          <div key={player.id} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex items-center gap-4 hover:border-emerald-500/40 transition shadow-lg">
+          <div key={player.id} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex items-center gap-4 hover:border-emerald-500/40 transition shadow-lg cursor-pointer" onClick={() => navigate(`/players/${player.id}/view`) }>
             <div className="h-12 w-12 rounded-full bg-slate-800 flex items-center justify-center text-emerald-400 font-bold border border-slate-700">
               #{player.jerseyNumber}
             </div>
