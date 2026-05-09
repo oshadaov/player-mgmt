@@ -91,12 +91,12 @@ const HeroSection = ({ clubsCount = 0 }) => {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3 md:justify-start">
-            <Link to="/login-player">
+            <Link to="/login">
               <button className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-xl shadow-emerald-500/30 transition hover:bg-emerald-400">
                 Player Login
               </button>
             </Link>
-            <Link to="/clublogin">
+            <Link to="/login">
               <button className="rounded-full border border-slate-500/70 bg-slate-900/75 px-6 py-3 text-sm font-semibold text-slate-100 transition hover:border-emerald-400/80 hover:text-emerald-300">
                 Club Login
               </button>

@@ -7,10 +7,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import PlayerListByClub from "./pages/PlayerListByClub";
 import CreateClubForm from "./pages/CreateClubForm";
 import ClubList from "./pages/ClubList";
-import ClubLogin from "./pages/ClubLogin";
 import LandingPage from "./pages/LandingPage";
 import ClubDashboard from "./pages/ClubDashboard";
-import PlayerLogin from "./pages/PlayerLogin";
 import PendingPlayerUpdates from "./pages/PendingPlayerUpdates";
 import EditClubForm from "./pages/EditClubForm";
 import SetPassword from "./pages/SetPassword";
@@ -30,7 +28,6 @@ import CoachList from "./pages/CoachList";
 import CoachDetails from "./pages/CoachDetails";
 import EditCoachForm from "./pages/EditCoachForm";
 import InviteClubForm from "./pages/InviteClubForm";
-import CompleteClubProfile from "./pages/CompleteClubProfile";
 import Signup from "./pages/Signup";
 import AdminClubReview from "./pages/AdminClubReview";
 
@@ -57,13 +54,12 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/clublogin" element={<ClubLogin />} />
-      <Route path="/login-player" element={<PlayerLogin />} />
+      <Route path="/clublogin" element={<LoginPage />} />
+      <Route path="/login-player" element={<LoginPage />} />
       <Route path="/club/set-password" element={<SetPassword />} />
       <Route path="/player/set-password" element={<SetPassword />} />
       <Route path="/registry" element={<PublicRegistry />} />
       <Route path="/matches" element={<MatchSchedule />} />
-      <Route path="/complete-club-profile" element={<CompleteClubProfile />} />
 
       {/* Public read views */}
       <Route path="/players" element={<PlayerList />} />

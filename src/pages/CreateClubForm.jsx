@@ -1,5 +1,6 @@
 // src/pages/CreateClubForm.jsx
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import PitchBg from "../assets/hero.jpg";
 import API from "../auth/api";
 
@@ -15,6 +16,9 @@ function parseJwt(token) {
 }
 
 const CreateClubForm = () => {
+  const [searchParams] = useSearchParams();
+  const invitationToken = searchParams.get("token");
+
   const [formData, setFormData] = useState({
     clubName: "",
     district: "",
@@ -47,6 +51,27 @@ const CreateClubForm = () => {
   // On mount: read email from JWT, then check if a rejected application exists to pre-fill
   useEffect(() => {
     const init = async () => {
+      // ── Handle Invitation Flow ─────────────────────────────────────
+      if (invitationToken) {
+        try {
+          const res = await API.get(`/api/clubs/token/${invitationToken}`);
+          const club = res.data;
+          if (club) {
+            setFormData((prev) => ({
+              ...prev,
+              clubName: club.clubName || "",
+              contactEmail: club.contactEmail || "",
+              licenseNumber: club.licenseNumber || "",
+            }));
+          }
+        } catch (err) {
+          console.error("Failed to fetch invitation details:", err);
+          setError("Invalid or expired invitation token.");
+        }
+        return; // Skip normal JWT/rejection check if inviting
+      }
+
+      // ── Handle Normal / Rejection Flow ──────────────────────────────
       const token = localStorage.getItem("token");
       if (!token) return;
 
@@ -89,7 +114,7 @@ const CreateClubForm = () => {
       }
     };
     init();
-  }, []);
+  }, [invitationToken]);
 
   // Fetch existing coaches
   useEffect(() => {
@@ -155,6 +180,7 @@ const CreateClubForm = () => {
       });
       if (logoFile) data.append("logoFile", logoFile);
       if (licenseFile) data.append("licenseFile", licenseFile);
+      if (invitationToken) data.append("invitationToken", invitationToken);
 
       await API.post("/api/clubs", data, {
         headers: {
