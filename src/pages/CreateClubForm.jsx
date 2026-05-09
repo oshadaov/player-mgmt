@@ -40,19 +40,55 @@ const CreateClubForm = () => {
   const [logoFile, setLogoFile] = useState(null);
   const [licenseFile, setLicenseFile] = useState(null);
   const [licensePreview, setLicensePreview] = useState(null);
+  const [rejectedClub, setRejectedClub] = useState(null); // pre-filled from rejected application
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Auto-populate email from JWT on mount
+  // On mount: read email from JWT, then check if a rejected application exists to pre-fill
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const init = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
       const payload = parseJwt(token);
       const email = payload?.sub || payload?.email || "";
+
+      // Always set email first
       if (email) {
         setFormData((prev) => ({ ...prev, contactEmail: email }));
       }
-    }
+
+      // Check for existing rejected application
+      try {
+        const res = await API.get("/api/clubs/my-application", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const club = res.data;
+        if (club && club.status === "REJECTED") {
+          setRejectedClub(club);
+          // Pre-fill all form fields with the previously submitted data
+          setFormData({
+            clubName:           club.clubName           || "",
+            district:           club.district           || "",
+            province:           club.province           || "",
+            contactPersonName:  club.contactPersonName  || "",
+            contactPhone:       club.contactPhone       || "",
+            contactEmail:       club.contactEmail       || email,
+            foundingYear:       club.foundingYear       || "",
+            homeGroundName:     club.homeGroundName     || "",
+            homeGroundLocation: club.homeGroundLocation || "",
+          });
+          // Show existing logo/license previews if available
+          if (club.licenseImageUrl) setLicensePreview(club.licenseImageUrl);
+        }
+      } catch (err) {
+        if (err.response?.status !== 404) {
+          console.warn("Could not check existing application:", err.message);
+        }
+        // 404 = no application yet, which is fine
+      }
+    };
+    init();
   }, []);
 
   // Fetch existing coaches
@@ -165,6 +201,28 @@ const CreateClubForm = () => {
         <section className="flex flex-1 items-start">
           <div className="grid w-full gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl backdrop-blur">
+              {/* Rejection banner — shown when resubmitting a rejected application */}
+              {rejectedClub && (
+                <div className="mb-4 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-red-400 text-base">✕</span>
+                    <p className="text-xs font-bold text-red-300 uppercase tracking-widest">
+                      Previous Application Rejected
+                    </p>
+                  </div>
+                  {rejectedClub.rejectionReason ? (
+                    <p className="text-xs text-red-200 mb-2">
+                      <span className="font-semibold">Reason: </span>{rejectedClub.rejectionReason}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-red-200 mb-2">No specific reason was provided.</p>
+                  )}
+                  <p className="text-[10px] text-slate-400">
+                    Your previous data has been pre-filled. Please address the rejection reason above, update any incorrect information, and resubmit.
+                  </p>
+                </div>
+              )}
+
               {error && (
                 <div className="mb-4 rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200">
                   {error}

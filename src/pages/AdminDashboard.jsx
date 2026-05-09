@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../auth/api";
 import PitchBg from "../assets/hero.jpg";
-import fallbackLogo from "../assets/placeholder.jpg"; 
+import fallbackLogo from "../assets/placeholder.jpg";
 import AdminClubRegistry from "../components/admin/AdminClubRegistry";
 import AdminClubApprovalList from "../components/admin/AdminClubApprovalList";
 import AdminPlayerRegistry from "../components/admin/AdminPlayerRegistry";
@@ -49,16 +49,13 @@ const AdminDashboard = () => {
     fetchClubs();
   }, []);
 
+  const [activeTab, setActiveTab] = useState("clubs");
   const totalClubs = clubs.length;
 
   // ✅ treat both clubLogo and logoUrl as possible Cloudinary URL fields
-  const clubsWithLogo = clubs.filter(
-    (c) => c.clubLogo || c.logoUrl
-  ).length;
+  const clubsWithLogo = clubs.filter((c) => c.clubLogo || c.logoUrl).length;
 
   const clubsWithoutLogo = totalClubs - clubsWithLogo;
-
-  const recentClubs = clubs.slice(0, 5);
 
   return (
     <div
@@ -113,7 +110,10 @@ const AdminDashboard = () => {
         {/* Top row: stats */}
         <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-4">
           <StatCard label="Total Clubs" value={totalClubs} />
-          <StatCard label="Pending Approval" value={clubs.filter(c => c.status === "PENDING").length} />
+          <StatCard
+            label="Pending Approval"
+            value={clubs.filter((c) => c.status === "PENDING").length}
+          />
           <StatCard label="With Logos" value={clubsWithLogo} />
           <StatCard label="Without Logo" value={clubsWithoutLogo} />
         </section>
@@ -129,140 +129,190 @@ const AdminDashboard = () => {
 
           <div className="grid gap-6 lg:grid-cols-[1fr,250px]">
             <div className="grid gap-3 sm:grid-cols-2 text-sm">
-            <Link
-              to="/admin/invite-club"
-              className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 hover:border-emerald-300 hover:bg-emerald-500/20 transition"
-            >
-              <div>
-                <p className="font-semibold text-emerald-200">
-                  Invite Club
-                </p>
-                <p className="text-[11px] text-emerald-100/80">
-                  Issue an official registration invitation to a new club.
-                </p>
-              </div>
-              <span className="text-xl">+</span>
-            </Link>
+              <Link
+                to="/admin/invite-club"
+                className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 hover:border-emerald-300 hover:bg-emerald-500/20 transition"
+              >
+                <div>
+                  <p className="font-semibold text-emerald-200">Invite Club</p>
+                  <p className="text-[11px] text-emerald-100/80">
+                    Issue an official registration invitation to a new club.
+                  </p>
+                </div>
+                <span className="text-xl">+</span>
+              </Link>
 
-            <Link
-              to="/create" // your player form route
-              className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
-            >
-              <div>
-                <p className="font-semibold text-slate-100">
-                  Add Player
-                </p>
-                <p className="text-[11px] text-slate-400">
-                  Register a new player and upload key documents.
-                </p>
-              </div>
-              <span className="text-xl text-emerald-300">⚽</span>
-            </Link>
+              <Link
+                to="/create" // your player form route
+                className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
+              >
+                <div>
+                  <p className="font-semibold text-slate-100">Add Player</p>
+                  <p className="text-[11px] text-slate-400">
+                    Register a new player and upload key documents.
+                  </p>
+                </div>
+                <span className="text-xl text-emerald-300">⚽</span>
+              </Link>
 
-            <Link
-              to="/admin/player-updates"
-              className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
-            >
-              <div>
-                <p className="font-semibold text-slate-100">
-                  Player Updates
-                </p>
-                <p className="text-[11px] text-slate-400">
-                  Review and approve player detail changes from clubs.
-                </p>
-              </div>
-              <span className="text-xl text-emerald-300">📝</span>
-            </Link>
+              <Link
+                to="/admin/player-updates"
+                className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
+              >
+                <div>
+                  <p className="font-semibold text-slate-100">Player Updates</p>
+                  <p className="text-[11px] text-slate-400">
+                    Review and approve player detail changes from clubs.
+                  </p>
+                </div>
+                <span className="text-xl text-emerald-300">📝</span>
+              </Link>
 
-            <Link
-              to="/clubs"
-              className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
-            >
-              <div>
-                <p className="font-semibold text-slate-100">
-                  View All Clubs
-                </p>
-                <p className="text-[11px] text-slate-400">
-                  Open the full clubs overview with search and filters.
-                </p>
-              </div>
-              <span className="text-xl text-emerald-300">📊</span>
-            </Link>
+              <Link
+                to="/clubs"
+                className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
+              >
+                <div>
+                  <p className="font-semibold text-slate-100">View All Clubs</p>
+                  <p className="text-[11px] text-slate-400">
+                    Open the full clubs overview with search and filters.
+                  </p>
+                </div>
+                <span className="text-xl text-emerald-300">📊</span>
+              </Link>
 
-            <Link
-              to="/admin/club-updates"
-              className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
-            >
-              <div>
-                <p className="font-semibold text-slate-100">
-                  Club Profile Updates
-                </p>
-                <p className="text-[11px] text-slate-400">
-                  Review and approve club data changes.
-                </p>
-              </div>
-              <span className="text-xl text-emerald-300">🏛️</span>
-            </Link>
+              <Link
+                to="/admin/club-updates"
+                className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 hover:border-emerald-300 transition"
+              >
+                <div>
+                  <p className="font-semibold text-slate-100">
+                    Club Profile Updates
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    Review and approve club data changes.
+                  </p>
+                </div>
+                <span className="text-xl text-emerald-300">🏛️</span>
+              </Link>
+            </div>
+
+            {/* Pending Approvals Sidebar */}
+            <div className="bg-slate-950/40 p-4 rounded-2xl border border-slate-800">
+              <h3 className="text-xs font-bold uppercase text-slate-500 mb-4 tracking-widest">
+                Pending Clubs
+              </h3>
+              <AdminClubApprovalList />
+            </div>
           </div>
+        </section>
 
-          {/* Pending Approvals Sidebar */}
-          <div className="bg-slate-950/40 p-4 rounded-2xl border border-slate-800">
-            <h3 className="text-xs font-bold uppercase text-slate-500 mb-4 tracking-widest">Pending Clubs</h3>
-            <AdminClubApprovalList />
-          </div>
-        </div>
-      </section>
-
-        {/* Registries Section */}
+        {/* Registry Tabs */}
         <section className="space-y-6">
-          {/* Club Registry */}
           <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
-                  Global Club Registry
+                  Admin Registry Tabs
                 </h2>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Authorized view of all federated football clubs.
+                  Switch between clubs, players, and coaching sections.
                 </p>
               </div>
-            </div>
-            <AdminClubRegistry />
-          </div>
-
-          {/* Player Registry */}
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
-            <div className="mb-6">
-              <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
-                Global Player Registry
-              </h2>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Authorized view of all registered players across all clubs.
-              </p>
-            </div>
-            <AdminPlayerRegistry />
-          </div>
-
-          {/* Coaching Management */}
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl backdrop-blur">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
-                  Coaching Staff Registry
-                </h2>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Manage professional coaching staff and club assignments.
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Link to="/admin/register-coach" className="bg-emerald-500 text-slate-950 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition">
-                  Register Coach
-                </Link>
-                <Link to="/coaches" className="bg-slate-950 border border-slate-800 text-slate-300 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-emerald-400 transition">
-                  View Full List
-                </Link>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: "clubs", label: "Clubs" },
+                  { id: "players", label: "Players" },
+                  { id: "coaching", label: "Coaching" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-widest transition ${
+                      activeTab === tab.id
+                        ? "bg-emerald-500 text-slate-950"
+                        : "bg-slate-950 border border-slate-800 text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
             </div>
+
+            {activeTab === "clubs" && (
+              <div className="grid gap-6 xl:grid-cols-[1fr,320px]">
+                <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
+                      Global Club Registry
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Authorized view of all federated football clubs.
+                    </p>
+                  </div>
+                  <AdminClubRegistry />
+                </div>
+
+                <div className="rounded-3xl border border-slate-800 bg-slate-950/40 p-4 shadow-inner">
+                  <h3 className="text-xs font-bold uppercase text-slate-500 mb-4 tracking-widest">
+                    Pending Clubs
+                  </h3>
+                  <AdminClubApprovalList />
+                </div>
+              </div>
+            )}
+
+            {activeTab === "players" && (
+              <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl backdrop-blur">
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
+                    Global Player Registry
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Authorized view of all registered players across all clubs.
+                  </p>
+                </div>
+                <AdminPlayerRegistry />
+              </div>
+            )}
+
+            {activeTab === "coaching" && (
+              <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl backdrop-blur">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-50 uppercase tracking-widest">
+                      Coaching Staff Registry
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Manage professional coaching staff and club assignments.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      to="/admin/register-coach"
+                      className="bg-emerald-500 text-slate-950 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition"
+                    >
+                      Register Coach
+                    </Link>
+                    <Link
+                      to="/coaches"
+                      className="bg-slate-950 border border-slate-800 text-slate-300 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-emerald-400 transition"
+                    >
+                      View Full List
+                    </Link>
+                  </div>
+                </div>
+                <div className="rounded-3xl border border-slate-800 bg-slate-950/40 p-5 text-slate-300">
+                  <p className="text-sm text-slate-300">
+                    Coaching management details are available in the coaching
+                    section. Use the buttons above to register new coaches or
+                    view the full coaching list.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </main>

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import LoginBg from "../assets/login.jpg"; // make sure this exists
-import api from "../auth/api.js"
+import api from "../auth/api.js";
 import { useAuth } from "../auth/AuthContext";
 
 const ClubLogin = () => {
@@ -25,24 +25,25 @@ const ClubLogin = () => {
     setError("");
 
     try {
-      const res = await api.post(
-        "/auth/login",
-        credentials
-      );
+      const res = await api.post("/auth/login", credentials);
 
       login(res.data.token);
       localStorage.setItem("userId", res.data.userId);
       localStorage.setItem("role", res.data.role);
-      localStorage.setItem("entityId", res.data.entityId);
+      localStorage.setItem("entityId", res.data.entityId || "");
       localStorage.setItem("username", res.data.username);
-      localStorage.setItem("user", JSON.stringify({
-        username: res.data.username,
-        role: res.data.role,
-        entityId: res.data.entityId
-      }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: res.data.username,
+          role: res.data.role,
+          entityId: res.data.entityId,
+        }),
+      );
 
       if (res.data.role === "CLUB") {
-        navigate(`/clubs/${res.data.entityId}`);
+        // Navigate to ClubDashboard which handles PENDING/REJECTED/APPROVED statuses
+        navigate("/club-dashboard");
       } else if (res.data.role === "ADMIN") {
         navigate("/admindashboard");
       } else {
@@ -150,7 +151,10 @@ const ClubLogin = () => {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
-                <Link to="/" className="hover:text-emerald-300 underline-offset-4 hover:underline">
+                <Link
+                  to="/"
+                  className="hover:text-emerald-300 underline-offset-4 hover:underline"
+                >
                   ← Back to Home
                 </Link>
                 <span className="hidden text-slate-600 md:inline">•</span>
@@ -245,7 +249,9 @@ const ClubLogin = () => {
 
         {/* Small footer */}
         <footer className="mt-6 flex items-center justify-between text-[11px] text-slate-500">
-          <span>© {new Date().getFullYear()} Sports Portal. All rights reserved.</span>
+          <span>
+            © {new Date().getFullYear()} Sports Portal. All rights reserved.
+          </span>
           <div className="flex gap-4">
             <button className="hover:text-emerald-300">Terms</button>
             <button className="hover:text-emerald-300">Privacy</button>

@@ -41,7 +41,7 @@ function App() {
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
     if (!token) return <Navigate to="/login" />;
-    
+
     const currentRole = user?.role || localStorage.getItem("role");
 
     // Check Role Permission
@@ -76,31 +76,165 @@ function App() {
       <Route path="/coaches/:id/view" element={<CoachDetails />} />
 
       {/* Club representative — create club (no entityId required) */}
-      <Route path="/create-club" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN", "CLUB"]}><CreateClubForm /></ProtectedRoute>} />
+      <Route
+        path="/create-club"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN", "CLUB"]}>
+            <CreateClubForm />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Club representative — dashboard (entityId required) */}
-      <Route path="/clubs/:id" element={<ProtectedRoute allowedRoles={["CLUB"]}><ClubDashboard /></ProtectedRoute>} />
-      <Route path="/club/edit-profile" element={<ProtectedRoute allowedRoles={["CLUB"]}><ClubProfileEdit /></ProtectedRoute>} />
-      <Route path="/club/player-updates" element={<ProtectedRoute allowedRoles={["CLUB"]}><ClubPlayerUpdates /></ProtectedRoute>} />
+      <Route
+        path="/clubs/:id"
+        element={
+          <ProtectedRoute allowedRoles={["CLUB"]}>
+            <ClubDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/club-dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["CLUB"]}>
+            <ClubDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/club/edit-profile"
+        element={
+          <ProtectedRoute allowedRoles={["CLUB"]}>
+            <ClubProfileEdit />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/club/player-updates"
+        element={
+          <ProtectedRoute allowedRoles={["CLUB"]}>
+            <ClubPlayerUpdates />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/players/register-player" element={<PlayerForm />} />
-      <Route path="/players/profile" element={<ProtectedRoute allowedRoles={["PLAYER"]}><PlayerProfile /></ProtectedRoute>} />
-      <Route path="/player/edit-profile" element={<ProtectedRoute allowedRoles={["PLAYER"]}><PlayerProfileEdit /></ProtectedRoute>} />
+      <Route
+        path="/players/profile"
+        element={
+          <ProtectedRoute allowedRoles={["PLAYER"]}>
+            <PlayerProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/player/edit-profile"
+        element={
+          <ProtectedRoute allowedRoles={["PLAYER"]}>
+            <PlayerProfileEdit />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Admin routes */}
-      <Route path="/admindashboard" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/superadmindashboard" element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/player-updates" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><PendingPlayerUpdates /></ProtectedRoute>} />
-      <Route path="/admin/club-updates" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><PendingClubUpdates /></ProtectedRoute>} />
-      <Route path="/admin/matches" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><AdminMatchManager /></ProtectedRoute>} />
-      <Route path="/admin/invite-club" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><InviteClubForm /></ProtectedRoute>} />
-      <Route path="/clubs" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><ClubList /></ProtectedRoute>} />
-      <Route path="/clubs/edit/:id" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><EditClubForm /></ProtectedRoute>} />
-      <Route path="/admin/clubs/:id/review" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}><AdminClubReview /></ProtectedRoute>} />
+      <Route
+        path="/admindashboard"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/superadmindashboard"
+        element={
+          <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
+            <SuperAdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/player-updates"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <PendingPlayerUpdates />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/club-updates"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <PendingClubUpdates />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/matches"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <AdminMatchManager />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/invite-club"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <InviteClubForm />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/clubs"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <ClubList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/clubs/edit/:id"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <EditClubForm />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/clubs/:id/review"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <AdminClubReview />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Coach management */}
-      <Route path="/admin/register-coach" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN", "CLUB"]}><CoachForm /></ProtectedRoute>} />
-      <Route path="/admin/edit-coach/:id" element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN", "CLUB"]}><EditCoachForm /></ProtectedRoute>} />
+      <Route
+        path="/admin/register-coach"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN", "CLUB"]}>
+            <CoachForm />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/edit-coach/:id"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN", "CLUB"]}>
+            <EditCoachForm />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

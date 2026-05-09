@@ -14,12 +14,20 @@ const ClubDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if ID is valid before making request
+    if (!id || id === "null" || id === "undefined") {
+      setClub(null);
+      setLoading(false);
+      return;
+    }
+
     const fetchClub = async () => {
       try {
         const res = await API.get(`/api/clubs/${id}`);
         setClub(res.data);
       } catch (err) {
         console.error("Error fetching club details:", err);
+        setClub(null);
       } finally {
         setLoading(false);
       }
@@ -27,27 +35,69 @@ const ClubDetails = () => {
     fetchClub();
   }, [id]);
 
-  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-emerald-400">Loading Club Profile...</div>;
-  if (!club) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-red-400">Club not found.</div>;
+  if (loading)
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-emerald-400">
+        Loading Club Profile...
+      </div>
+    );
+
+  if (!club) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-red-400 gap-6">
+        <div className="text-center space-y-3">
+          <h2 className="text-2xl font-bold">Club Not Found</h2>
+          <p className="text-sm text-slate-400">
+            The club profile could not be loaded.
+          </p>
+          {(!id || id === "null" || id === "undefined") && (
+            <p className="text-xs text-amber-400">
+              ⚠ Invalid club ID provided.
+            </p>
+          )}
+        </div>
+        <button
+          onClick={() => navigate(-1)}
+          className="rounded-lg bg-emerald-500 px-4 py-2 text-slate-950 font-semibold hover:bg-emerald-400 transition"
+        >
+          ← Go Back
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-8" style={{ backgroundImage: `url(${PitchBg})`, backgroundSize: "cover" }}>
+    <div
+      className="min-h-screen bg-slate-950 text-white p-8"
+      style={{ backgroundImage: `url(${PitchBg})`, backgroundSize: "cover" }}
+    >
       <div className="max-w-6xl mx-auto">
         <header className="mb-8 flex justify-between items-center">
-          <button onClick={() => navigate(-1)} className="text-slate-400 hover:text-white transition">← Back</button>
-          <h1 className="text-2xl font-bold uppercase tracking-widest text-emerald-400">Official Club Profile</h1>
+          <button
+            onClick={() => navigate(-1)}
+            className="text-slate-400 hover:text-white transition"
+          >
+            ← Back
+          </button>
+          <h1 className="text-2xl font-bold uppercase tracking-widest text-emerald-400">
+            Official Club Profile
+          </h1>
           <div className="w-12"></div>
         </header>
 
         <ClubOverviewCard club={club} playerCount={club.players?.length || 0} />
 
         <div className="mt-12">
-          <h2 className="text-xl font-bold mb-6 border-b border-slate-800 pb-2 text-sky-400">Technical Staff</h2>
+          <h2 className="text-xl font-bold mb-6 border-b border-slate-800 pb-2 text-sky-400">
+            Technical Staff
+          </h2>
           <ClubCoachList clubId={id} />
         </div>
-        
+
         <div className="mt-12">
-          <h2 className="text-xl font-bold mb-6 border-b border-slate-800 pb-2">Registered Squad</h2>
+          <h2 className="text-xl font-bold mb-6 border-b border-slate-800 pb-2">
+            Registered Squad
+          </h2>
           <ClubSquadManager clubId={id} />
         </div>
       </div>
